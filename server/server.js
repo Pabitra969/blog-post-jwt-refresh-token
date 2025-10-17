@@ -25,7 +25,7 @@ const userControllers = require('./controllers/userControllers');
 
 // cors middleware
 const corsOptions = {
-  origin: ['*'],
+  origin: ['http://20.197.14.144'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
