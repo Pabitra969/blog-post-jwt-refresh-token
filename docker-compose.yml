@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    ports:
+      # Vite's default port is 5173
+      - "5173:5173"
+    volumes:
+      # Mount the client source code for hot-reloading
+      - ./client:/app
+      # This prevents the node_modules in your local machine from overwriting
+      # the one in the container.
+      - /app/node_modules
+
+  server:
+    build: ./server # This will use server/Dockerfile
+    command: npx nodemon server.js # Override the Dockerfile's CMD to use nodemon
+    ports:
+      - "5002:5002"
+    environment:
+      - DB_USER=pabitra
+      - DB_HOST=db
+      - DB_NAME=mydb
+      - DB_PASSWORD=123123
+      - DB_PORT=5432
+      - PORT=5002
+      - JWT_SECRET=lusifer
+      - ACCESS_TOKEN_SECRET="lusifer"
+      - REFRESH_TOKEN_SECRET="raone"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # In development, you might want to mount your source code
+      # to see changes without rebuilding the image.
+      # For production, it's better to have the code inside the image.
+      - ./server:/usr/src/app
+      # This prevents the node_modules in your local machine from overwriting
+      # the one in the container.
+      - /usr/src/app/node_modules
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=pabitra
+      - POSTGRES_PASSWORD=123123
+      - POSTGRES_DB=mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pabitra -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

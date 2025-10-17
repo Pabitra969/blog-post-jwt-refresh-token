@@ -1,0 +1,10 @@
+# Ignore dependencies, as they are installed inside the container
+node_modules
+
+# Ignore the build output, as it is generated inside the container
+build
+
+# Ignore logs, git files, and local environment files
+npm-debug.log
+.git
+.gitignore
